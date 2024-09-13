@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35219.272
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegistruCentras", "RegistruCentras\RegistruCentras.csproj", "{20A014F2-1516-40D6-93F5-87810B3C9791}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAR", "JAR\JAR.csproj", "{7E57D571-2290-41FD-BEBE-55DD6CE13562}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20A014F2-1516-40D6-93F5-87810B3C9791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20A014F2-1516-40D6-93F5-87810B3C9791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20A014F2-1516-40D6-93F5-87810B3C9791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20A014F2-1516-40D6-93F5-87810B3C9791}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E57D571-2290-41FD-BEBE-55DD6CE13562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E57D571-2290-41FD-BEBE-55DD6CE13562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E57D571-2290-41FD-BEBE-55DD6CE13562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E57D571-2290-41FD-BEBE-55DD6CE13562}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {24BEB58B-98EB-4245-BCB6-7F9F03158AD3}
+	EndGlobalSection
+EndGlobal
