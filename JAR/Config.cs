@@ -1,3 +1,4 @@
+using Npgsql;
 using System.Text.Json;
 
 namespace JAR;
@@ -8,14 +9,37 @@ public class ConfigData {
 	public string Cert { get; set; } = "";
 	public string Pass { get; set; } = "";
 	public string ConnectionString { get; set; } = "User ID=postgres; Password=postgres; Server=localhost:5432; Database=master;";
-	public Dictionary<string, ConfigTables>? Tables { get; set; }
-
-	public DBBulk? Get(string val) => Tables?.TryGetValue(val, out var t) == true ? DB.Bulk(t.Table, t.Fields) : null;
+	public string Schema { get; set; } = "jar";
+	public Dictionary<string, ConfigTable>? Tables { get; set; }
 }
 
-public class ConfigTables {
+public class ConfigTable {
+	public string ID { get; set; } = "";
 	public string Table { get; set; } = "";
+	public string? Schema { get; set; }
 	public List<string> Fields { get; set; } = [];
+	public List<string> Types { get; set; } = [];
+	public DBBulk? Blk { get; set; }
+	public async Task Complete() {
+		if (Blk is not null) {
+			Blk.Complete();
+			var f = string.Join(",", Fields);
+			using var del = new NpgsqlCommand($"DELETE FROM {Schema}.{Table} WHERE {ID} in (SELECT {ID} FROM temp_{Table});", Blk.Conn);
+			await del.ExecuteNonQueryAsync();
+			using var ins = new NpgsqlCommand($"INSERT INTO {Schema}.{Table} ({f}) SELECT {f} FROM temp_{Table};", Blk.Conn);
+			await ins.ExecuteNonQueryAsync();
+		}
+	}
+	public async Task Init(ConfigData cfg) {
+		var flds = new List<string>(); var fld= Schema = cfg.Schema;
+		for (var k = 0; k < Fields.Count; k++) {
+			flds.Add($"{Fields[k]} {Types[k]}");
+		}
+		Blk = new DBBulk($"temp_{Table}", Fields, cfg.ConnectionString);
+		using var cmd = new NpgsqlCommand($"CREATE TEMPORARY TABLE  temp_{Table} ({string.Join(",", flds)});", Blk.Conn);
+		await cmd.ExecuteNonQueryAsync();
+
+	}
 }
 
 public class Configuration : Config<ConfigData> { }

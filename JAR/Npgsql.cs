@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace JAR {
-	//private static readonly string InsertRcDokumentas = "INSERT INTO raw_rc_dokumentai (dok_id,dok_kodas,dok_nr,dok_pastabos,dok_data,dok_data_pateik,dok_data_reg,dok_tipas,dok_potipis,dok_notaro_nr,dok_anul) VALUES (@id,@kodas,@nr,@pastabos,@data,@datapateik,@datareg,@tipas,@potipis,@notaronr,@anul);";
 
 
 	public static class DB {
@@ -16,18 +15,38 @@ namespace JAR {
 			var conn = new NpgsqlConnection(ConnStr); await conn.OpenAsync();
 			return await new NpgsqlCommand(sql, conn).ExecuteNonQueryAsync();
 		}
-		public static DBBulk Bulk(string table, List<string> fld) => new (table, fld, DB.ConnStr);
-    }
+		public static DBBulk Bulk(string table, List<string> fld) => new(table, fld, DB.ConnStr);
+
+		public static async Task<NpgsqlDataReader> Read(string sql) {
+			var conn = new NpgsqlConnection(ConnStr); await conn.OpenAsync();
+			using var command = new NpgsqlCommand(sql, conn);
+			return await command.ExecuteReaderAsync();
+		}
+	}
 
 	public class DBBulk : IDisposable {
+		public string Table { get; }
         public List<string> Fields { get; }
-		private NpgsqlConnection Conn { get; set; }
-		private NpgsqlBinaryImporter Imp { get; set; }
-		public void Insert(object?[] row) { lock (Imp) Imp.WriteRow(row); }
-		public void Complete() { Imp.Complete(); }
-        public DBBulk(string table, List<string> fld, string conn) {
-			Fields = fld; Conn = new NpgsqlConnection(conn); Conn.Open();
-			Imp = Conn.BeginBinaryImport($"COPY {table} ({string.Join(", ", Fields)}) FROM STDIN (FORMAT BINARY)");
+		public NpgsqlConnection Conn { get; private set; }
+		private NpgsqlBinaryImporter? Imp { get; set; }
+		private object Lock { get; set; } = new object();
+		private NpgsqlBinaryImporter GetImp => Imp ??= Conn.BeginBinaryImport($"COPY {Table} ({string.Join(", ", Fields)}) FROM STDIN (FORMAT BINARY)");
+		public void Insert(object?[] row) { lock (Lock) GetImp.WriteRow(row); }
+		public void Insert(object?[] row, NpgsqlDbType?[] type) {
+			lock (Lock) {
+				GetImp.StartRow();
+				for(var i=0; i<row.Length; i++) {
+					var r = row[i]; var t = type[i];
+					if (r is null) GetImp.WriteNull();
+					else if (t is null) GetImp.Write(r);
+					else GetImp.Write(r, t.Value);
+				}
+			}
+		}
+		public void Complete() { GetImp.Complete(); GetImp.Dispose(); }
+		public async Task CompleteAsync() { await GetImp.CompleteAsync(); await GetImp.DisposeAsync(); }
+		public DBBulk(string table, List<string> fld, string conn) {
+			Table = table; Fields = fld; Conn = new NpgsqlConnection(conn); Conn.Open();
 		}
 
 		private bool IsDisposed;

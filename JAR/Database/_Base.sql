@@ -101,8 +101,11 @@ CREATE TABLE jar.raw_rc_ja_asmenys (
 	jas_ja_id bigint,
 	jas_neid_id bigint,
 	jas_nja_id bigint,
-	jas_ste_id int
+	jas_ste_id int,
+	jas_ntr_id bigint,
+	jar_ntr_kodas varchar(255)
 );
+
 CREATE TABLE jar.raw_rc_ja_finansine_atskaitomybe (
 	jfa_jar_id bigint not null,
 	jfa_data_nuo date,
@@ -132,8 +135,8 @@ CREATE TABLE jar.raw_rc_ja_faktai (
 	jfk_katId int,
 	jfk_prokur_nr bigint,
 	jfk_dokumentai bigint[],
-	jfk_naudotojai jsonb[],
-	jfk_kategorijos jsonb[]
+	jfk_naudotojai jsonb,
+	jfk_kategorijos jsonb
 );
 
 CREATE TABLE jar.raw_rc_dokumentai (
@@ -147,6 +150,7 @@ CREATE TABLE jar.raw_rc_dokumentai (
 	dok_tipas int not null,
 	dok_potipis int not null,
 	dok_notaro_nr varchar(255),
+	dok_fiz_id int,
 	dok_anul int
 );
 
@@ -197,7 +201,7 @@ CREATE TABLE jar.raw_rc_uszien_steigejai (
 	ust_registras varchar(255),
 	ust_salis int,
 	ust_sal_kodas varchar(255),
-	ust_kapitalas int,
+	ust_kapitalas bigint,
 	usr_f_metai_nuo varchar(255)
 );
 
@@ -222,5 +226,6 @@ CREATE TABLE jar.raw_rc_uszien_adresai (
 	uza_data_nuo date,
 	uza_data_iki date
 );
+
 
 

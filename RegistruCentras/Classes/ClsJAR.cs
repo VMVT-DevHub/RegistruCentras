@@ -1,4 +1,5 @@
 
+using System.Runtime.Intrinsics.Arm;
 using System.Xml;
 using Microsoft.Win32;
 using RC.Extensions;
@@ -251,11 +252,15 @@ public class JaObjAsm : ILoadXML {
 	public long? Kodas { get; set; }
 	public string? Pavadinimas { get; set; }
 	public string? Adresas { get; set; }
+	public string? JADTekstas { get; set; } //new
 	public long? AOB { get; set; }
 	public int? AdrBus { get; set; }
-    public long? NeidId { get; set; }
+	public long? NTRId { get; set; } //new
+	public string? NTRKodas { get; set; } //new
+	public long? NeidId { get; set; }
     public long? NjaId { get; set; }
 	public int? SteId { get; set; }
+
 	void ILoadXML.LoadAttr(string key, string val, XmlReader rdr) {
 		switch(key){
 			case "OBA_ID": ID=rdr.ValLong()??-1; break;
@@ -264,9 +269,12 @@ public class JaObjAsm : ILoadXML {
 			case "OBJ_ID_ASM": JaId=rdr.ValLong(); break;
 			case "OBJ_KODAS": Kodas=rdr.ValLong(); break;
 			case "OBJ_PAV": Pavadinimas=val; break;
-			case "JAD_TEKSTAS": Adresas=val; break;
+			case "ADRESAS": Adresas = val; break;
+			case "JAD_TEKSTAS": JADTekstas = val; break;
 			case "ARO_KODAS": AOB=rdr.ValLong(); break;
-			case "ADR_BUS": AdrBus=rdr.ValInt(); break;
+			case "ADR_BUS": AdrBus = rdr.ValInt(); break;
+			case "OBJ_ID_NTR": NTRId = rdr.ValLong(); break;
+			case "NTR_OBJ_KODAS": NTRKodas = val; break;
 			case "NJA_ID": NjaId = rdr.ValInt(); break;
 			case "STE_ID": SteId=rdr.ValInt(); break;
 			default: Console.WriteLine($"JAObjAsm: {key}: {val}"); break;
@@ -368,7 +376,9 @@ public class JaFaktNaud : ILoadXML {
 	public int? JungtNuosavybe { get; set; }
 	public int? Par { get; set; }
     public string? Aprasymas { get; set; }
-    public DateOnly? DataNuo { get; set; }
+	public int? Kapitalas { get; set; }
+	public int? KVONarys { get; set; }
+	public DateOnly? DataNuo { get; set; }
 	public DateOnly? DataIki { get; set; }
 	public DateOnly? DataPradzios { get; set; }
 	public DateOnly? DataPabaigos { get; set; }
@@ -380,6 +390,8 @@ public class JaFaktNaud : ILoadXML {
 			case "FNA_JUNGT_NUOSAVYBE": JungtNuosavybe=rdr.ValInt(); break;
 			case "PAR_KODAS": Par=rdr.ValInt(); break;
 			case "FNA_APRASYMAS": Aprasymas=val; break;
+			case "FNA_KAPITALAS": Kapitalas=rdr.ValInt(); break;
+			case "FNA_KVO_NARYS": KVONarys=rdr.ValInt(); break;
 			case "FNA_DATA_NUO": DataNuo=rdr.ValDate(); break;
 			case "FNA_DATA_IKI": DataIki=rdr.ValDate(); break;
 			case "FNA_PRADZIOS_DATA": DataPradzios=rdr.ValDate(); break;
@@ -485,6 +497,7 @@ public class JaDok : ILoadXML {
 	public int Potipis { get; set; }
 	public string? NotaroNr { get; set; }
 	public long? Kodas { get; set; }
+	public int? FizId { get; set; }
 	public int? Anul { get; set; }
 	void ILoadXML.LoadAttr(string key, string val, XmlReader rdr) {
 		switch (key) {
@@ -498,6 +511,7 @@ public class JaDok : ILoadXML {
 			case "DOKP_POTIPIS": Potipis = rdr.ValInt() ?? -1; break;
 			case "DOK_NOTARO_REG_NR": NotaroNr = val; break;
 			case "DOKI_KODAS": Kodas = rdr.ValInt() ?? -1; break;
+			case "FIZ_ID": Kodas = rdr.ValInt() ?? -1; break;
 			case "DOK_ANUL": Anul = rdr.ValInt(); break;
 			default: Console.WriteLine($"JADok: {key}: {val}"); break;
 		}
@@ -516,7 +530,7 @@ public class JaUzsSteig : ILoadXML {
 	public string? Registras { get; set; }
 	public int? Salis { get; set; }
 	public string? SalKodas { get; set; }
-	public int? Kapitalas { get; set; }
+	public long? Kapitalas { get; set; }
     public string? FMetaiNuo { get; set; }
     public List<JaUzsAdres>? Adresai { get; set; }
 	public List<JaUzsPavad>? Pavadinimai { get; set; }
@@ -534,7 +548,7 @@ public class JaUzsSteig : ILoadXML {
 			case "STE_REG_DATA": DataReg = rdr.ValDate(); break;
 			case "STE_REGISTRAS": Registras = val; break;
 			case "SAL_KODAS": Salis = rdr.ValInt(); break;
-			case "STE_KAPITALAS": Kapitalas = rdr.ValInt(); break;
+			case "STE_KAPITALAS": Kapitalas = rdr.ValLong(); break;
 			case "STE_FMETAI_NUO": FMetaiNuo = val; break;
 			case "VALI_TRIRAIDIS_KODAS": SalKodas = val; break;
 			default: Console.WriteLine($"JaUzsSteig: {key}: {val}"); break;
