@@ -10,7 +10,14 @@ public class ConfigData {
 	public string Pass { get; set; } = "";
 	public string ConnectionString { get; set; } = "User ID=postgres; Password=postgres; Server=localhost:5432; Database=master;";
 	public string Schema { get; set; } = "jar";
-	public Dictionary<string, ConfigTable>? Tables { get; set; }
+	public string MainTable { get; set; } = "jarobj";
+	public string ItemQuery { get; set; } = "";
+	public int ItemLimit { get; set; } = 1000;
+	public string ItemComplete { get; set; } = "SELECT jar.data_load();";
+    public int Threads { get; set; } = 10;
+	public int Loops { get; set; } = 1;
+	public bool PrintOutput { get; set; } = true;
+    public Dictionary<string, ConfigTable>? Tables { get; set; }
 }
 
 public class ConfigTable {
@@ -24,10 +31,9 @@ public class ConfigTable {
 		if (Blk is not null) {
 			Blk.Complete();
 			var f = string.Join(",", Fields);
-			using var del = new NpgsqlCommand($"DELETE FROM {Schema}.{Table} WHERE {ID} in (SELECT {ID} FROM temp_{Table});", Blk.Conn);
-			await del.ExecuteNonQueryAsync();
-			using var ins = new NpgsqlCommand($"INSERT INTO {Schema}.{Table} ({f}) SELECT {f} FROM temp_{Table};", Blk.Conn);
-			await ins.ExecuteNonQueryAsync();
+			using var trn = new NpgsqlCommand($"DELETE FROM {Schema}.{Table} WHERE {ID} in (SELECT {ID} FROM temp_{Table});"
+				+$"INSERT INTO {Schema}.{Table} ({f}) SELECT {f} FROM temp_{Table};", Blk.Conn);
+			await trn.ExecuteNonQueryAsync();
 		}
 	}
 	public async Task Init(ConfigData cfg) {
@@ -36,7 +42,7 @@ public class ConfigTable {
 			flds.Add($"{Fields[k]} {Types[k]}");
 		}
 		Blk = new DBBulk($"temp_{Table}", Fields, cfg.ConnectionString);
-		using var cmd = new NpgsqlCommand($"CREATE TEMPORARY TABLE  temp_{Table} ({string.Join(",", flds)});", Blk.Conn);
+		using var cmd = new NpgsqlCommand($"CREATE TEMPORARY TABLE temp_{Table} ({string.Join(",", flds)});", Blk.Conn);
 		await cmd.ExecuteNonQueryAsync();
 
 	}
@@ -81,11 +87,16 @@ public class Config<T>() where T : new() {
 	}
 	private T LoadSecrets(T data) {
 		if (File.Exists(JsonSecrets)) {
+			var dflt = new T();
 			var secr = JsonSerializer.Deserialize<T>(File.ReadAllText(JsonSecrets));
 			if (secr is not null) foreach (var i in secr.GetType().GetProperties()) {
 					var val = i.GetValue(secr);
-					if (val is string v) { if (!string.IsNullOrEmpty(v)) i.SetValue(data, val); }
-					else if (val is not null) i.SetValue(data, val);
+					var df = i.GetValue(dflt);
+					if (val is string v) { if (!string.IsNullOrEmpty(v) && val!=df) i.SetValue(data, val); }
+					else if (val is not null) {
+						if(!i.PropertyType.IsPrimitive || val.ToString()!=df?.ToString()) 
+							i.SetValue(data, val); 
+					}
 				}
 		}
 		return data;
