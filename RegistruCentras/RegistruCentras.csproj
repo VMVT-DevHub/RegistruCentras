@@ -5,4 +5,7 @@
 		<Nullable>enable</Nullable>
 		<RootNamespace>RC</RootNamespace>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DebugType>none</DebugType>
+	</PropertyGroup>
 </Project>
