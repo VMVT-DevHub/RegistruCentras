@@ -25,7 +25,16 @@ var rc = new RegistruCentras(cfg.Cert, cfg.Pass) {
 var jar = rc.GetJAR();
 jar.Threads = cfg.Threads;
 
-if (args.Length > 0 && args[0] == "clf") {
+
+if (args.Length > 0 && args[0] == "hist") {
+	var dt1 = await jar.ListNauji(DateTime.Now.AddDays(-1));
+	var dt2 = await jar.ListKeisti(DateTime.Now.AddDays(-1));
+	var dt3 = await jar.ListIsreg(DateTime.Now.AddDays(-1));
+	Console.WriteLine(JsonSerializer.Serialize(dt1));
+	Console.WriteLine(JsonSerializer.Serialize(dt2));
+	Console.WriteLine(JsonSerializer.Serialize(dt3));
+}
+else if (args.Length > 0 && args[0] == "clf") {
 	var clf = await jar.KlasifPilnas();
 	//if(clf.error...
 

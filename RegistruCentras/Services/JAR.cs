@@ -69,6 +69,20 @@ public  class JAR(RegistruCentras rc) {
 		return cl;
 	}
 
+
+	public async Task<JARAtributai> ListNauji(DateTime date) {
+		var dt = await RC.Sign(new RCDataRequest() { Data=date, ActionType = (int)ActionType.ListNauji, CallerCode = RC.User }).Execute(RC.Url);
+		return new JARAtributai(dt);
+	}
+	public async Task<JARAtributai> ListIsreg(DateTime date) {
+		var dt = await RC.Sign(new RCDataRequest() { Data = date, ActionType = (int)ActionType.ListIsreg, CallerCode = RC.User }).Execute(RC.Url);
+		return new JARAtributai(dt);
+	}
+	public async Task<JARAtributai> ListKeisti(DateTime date) {
+		var dt = await RC.Sign(new RCDataRequest() { Data = date, ActionType = (int)ActionType.ListKeisti, CallerCode = RC.User }).Execute(RC.Url);
+		return new JARAtributai(dt);
+	}
+
 	public enum ActionType {
 		Trumpas = 76,
 		Pagrindinis= 77,

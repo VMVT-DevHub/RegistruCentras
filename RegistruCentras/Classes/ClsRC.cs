@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -16,6 +16,7 @@ public class RCResponse {
 
 public class RCDataResponse : IXmlSerializable {
 	public JaResponse? JA { get; set; }
+	public GrResponse? GR { get; set; }
 	public List<RowSet>? Data { get; set; }
 	public RCResponse Response { get; set; } = new();
 
@@ -38,10 +39,16 @@ public class RCDataResponse : IXmlSerializable {
 							while(dtr.Read()) {
 								if(dtr.IsStartElement()){
 									switch (dtr.LocalName) {
+										//TODO: sukurti metodą parsinimui
 										case "JAR": JA=dtr.Fill<JaResponse>(); break;
 										case "OBJEKTAI": JA=new(dtr.Fill<JaItem>()); break;
 										case "ROWSET": Data=[]; break;
 										case "ROW": (Data??=[]).Add(dtr.Fill<RowSet>()); break;
+										case "personDetailInformation": 
+										case "personDetailInformation1": 
+										case "personDetailInformation2": 
+										case "personDetailInformation3": 
+										case "personDetailInformation4": GR = dtr.Fill<GrResponse>(); break;
 										default: Console.WriteLine($"Base64 Missing: {dtr.LocalName}"); break;
 									}
 									if(dtr.NodeType == XmlNodeType.Text) Console.WriteLine($"{new string('\t', dtr.Depth)}->{dtr.Value}");
@@ -61,6 +68,7 @@ public class RCDataResponse : IXmlSerializable {
 
 public class RCDataRequest : IXmlSerializable {
 	public long ID { get; set; }
+	public long AK { get; set; }
 	public DateTime? Data { get; set; }
 	public string? Klasifikatorius { get; set; }
 	public int ActionType { get; set; }
@@ -79,7 +87,9 @@ public class RCDataRequest : IXmlSerializable {
 		using (var wrt = XmlWriter.Create(sb)){
 			wrt.WriteStartElement("args");
 			if(ID>0) wrt.WriteElementString("obj_kodas",ID.ToString());
-			if(Data is not null) wrt.WriteElementString("data", Data.Value.ToString("yyyy-MM-dd"));
+			//TODO: Sukurti extensions
+			if(AK>0) wrt.WriteElementString("asm_kodas", AK.ToString());
+			if (Data is not null) wrt.WriteElementString("data", Data.Value.ToString("yyyy-MM-dd"));
 			if(Klasifikatorius is not null) wrt.WriteElementString("kla_kodas",Klasifikatorius);
 			wrt.WriteElementString("fmt","xml");
 			wrt.WriteEndElement();

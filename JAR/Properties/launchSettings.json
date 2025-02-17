@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "JAR": {
+      "commandName": "Project",
+      "commandLineArgs": "hist"
+    }
+  }
+}
