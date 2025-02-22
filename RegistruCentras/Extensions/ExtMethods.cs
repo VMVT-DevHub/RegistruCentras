@@ -1,4 +1,6 @@
+using RC.Classes;
 using System.Reflection.PortableExecutable;
+using System.Text.Json;
 using System.Xml;
 
 namespace RC.Extensions;
@@ -31,12 +33,19 @@ public static class Extensions {
 	public static long? DataLong(this XmlReader rdr) {
 		if (long.TryParse(rdr.DataString(), out var val)) return val; else Console.WriteLine($"Wrong Type: {rdr.Name}: (long){rdr.Value}"); return null;
 	}
+	public static DateOnly? DataDate(this XmlReader rdr) {
+		if (DateOnly.TryParse(rdr.DataString(), out var val)) return val; else Console.WriteLine($"Wrong Type: {rdr.Name}: (DateOnly){rdr.Value}"); return null;
+	}
+
 
 	public static T Fill<T>(this XmlReader rdr) where T : ILoadXML, new() {
 		var obj = rdr.LocalName;
 		var rd = rdr.ReadSubtree();
 		var ret = new T();
 		if(rd.ReadToFollowing(obj)) ret.Load(rd);
+		if(ret is GrResponse r) {
+			Console.Write($"{r.AK}|{r.MirtiesData}");
+		}
 		return ret;
 	}
 
