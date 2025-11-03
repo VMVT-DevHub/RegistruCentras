@@ -19,15 +19,18 @@ var rc = new RegistruCentras(cfg.Cert, cfg.Pass) {
 
 
 
-	foreach (string line in File.ReadLines("list.txt")) {
-		// Process each line here
-		if (long.TryParse(line, out var ak)) {
-			Console.Write($"\n{line}|");
-			var dt5 = await rc.Sign(new RCDataRequest() { AK = ak, ActionType = 605, CallerCode = rc.User }).Execute(rc.Url);
-		} else {
-			Console.WriteLine($"Error: {line}");
-		}
+foreach (string line in File.ReadLines("list.txt")) {
+	// Process each line here
+	if (long.TryParse(line, out var ak)) {
+		Console.Write($"\n{line}|");
+		var dt5 = await rc.Sign(new RCDataRequest() { AK = ak, ActionType = 605, CallerCode = rc.User }).Execute(rc.Url);
+		if (dt5.GR is not null) Console.Write($"{dt5.GR.AK}|{dt5.GR.MirtiesData}");
+		else Console.Write($"Error {dt5.Response.Message}");
 	}
+	else {
+		Console.WriteLine($"Error: {line}");
+	}
+}
 
 
 //while (true) {

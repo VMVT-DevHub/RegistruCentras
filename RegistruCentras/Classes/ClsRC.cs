@@ -35,6 +35,8 @@ public class RCDataResponse : IXmlSerializable {
 					case "ResponseCode": Response.Status=reader.Next().ValInt()??0;  break;
 					case "ResponseData": 
 						if(Response.Status==1){
+							// Ataskymas
+							// var tx =  System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(reader.ReadElementContentAsString()));
 							var dtr  = XmlReader.Create(new Base64Stream(reader));
 							while(dtr.Read()) {
 								if(dtr.IsStartElement()){

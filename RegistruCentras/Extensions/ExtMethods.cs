@@ -43,9 +43,6 @@ public static class Extensions {
 		var rd = rdr.ReadSubtree();
 		var ret = new T();
 		if(rd.ReadToFollowing(obj)) ret.Load(rd);
-		if(ret is GrResponse r) {
-			Console.Write($"{r.AK}|{r.MirtiesData}");
-		}
 		return ret;
 	}
 
