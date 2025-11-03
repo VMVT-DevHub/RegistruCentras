@@ -1,7 +1,5 @@
 
-using System.Runtime.Intrinsics.Arm;
 using System.Xml;
-using Microsoft.Win32;
 using RC.Extensions;
 
 namespace RC.Classes;

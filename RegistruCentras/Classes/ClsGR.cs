@@ -1,10 +1,6 @@
 
-using Microsoft.Win32;
 using RC.Extensions;
-using System.Buffers.Text;
-using System.Runtime.Intrinsics.Arm;
 using System.Xml;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RC.Classes;
 
