@@ -258,5 +258,13 @@ ALTER TABLE jar.raw_rc_jar ADD CONSTRAINT raw_rc_jar_unique UNIQUE (jar_kodas);
 CREATE OR REPLACE VIEW jar.v_raw_iregistruoti AS
    SELECT j.ja_kodas,COALESCE(r.jar_pavadinimas,j.ja_pavadinimas) as ja_pavadinimas,j.adresas,a.aob_kodas,form_kodas,form_pavadinimas,status_kodas, COALESCE(s.stat_pavad,stat_pavadinimas) stat_pavadinimas,stat_data,reg_data,a.adresas_nuo aob_data,j.formavimo_data 
    FROM jar.raw_iregistruoti j LEFT JOIN jar.raw_rc_jar r on (j.ja_kodas=r.jar_kodas) LEFT JOIN jar.clf_status s on (j.status_kodas=s.stat_id) LEFT JOIN jar.raw_adresai a on (j.ja_kodas=a.ja_kodas);
-*/
 
+
+CREATE OR REPLACE VIEW jar.v_rc_update AS
+WITH jad as (SELECT log_jar, max(log_date) log_date FROM jar.log_updates WHERE log_date>now() - INTERVAL '1 year' GROUP BY log_jar)
+SELECT DISTINCT d.ja_kodas FROM jar.data d LEFT JOIN jad on (d.ja_kodas=log_jar) 
+WHERE d.status_kodas<>10 AND (log_jar is null OR d.formavimo_data>log_date);
+
+
+
+*/
